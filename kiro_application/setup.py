@@ -28,6 +28,7 @@ setup(
             'stop=kiro_application.stop:main',
             'lane_detect=kiro_application.lane_detect:main',
             'limo_control=kiro_application.limo_control:main',
+            'take_a_picture=kiro_application.take_a_picture:main',
         ],
     },
 )
