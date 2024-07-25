@@ -7,6 +7,7 @@ from cv_bridge import CvBridge
 from tensorflow import keras
 
 from sensor_msgs.msg import Image
+from kiro_msgs.msg import Error
 
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -34,6 +35,8 @@ class DLDetectLine(Node):
 
         # Publish Image for debugging
         self.debug_publisher = self.create_publisher(Image, 'debug_image', 10)
+        self.error_publisher = self.create_publisher(Error, 'dl_gap', 10)
+
 
     def initModel(self):
         input1 = keras.layers.Input(
@@ -94,11 +97,15 @@ class DLDetectLine(Node):
         cx_1 = int(300 * x_1)
         cx_2 = int(300 * x_2)
 
+        gap = Error()
+        gap.error_1 = 150 - cx_1
+        gap.error_2 = 150 - cx_2
+
         debug_image = cv2.circle(resize_img, (cx_1, 190), 10, (255, 0, 0), -1)
         debug_image = cv2.circle(debug_image, (cx_2, 190), 10,(0, 0, 255), -1)
 
         self.debug_publisher.publish(self.br.cv2_to_imgmsg(debug_image, 'bgr8'))
-
+        self.error_publisher.publish(gap)
 
 def main(args=None):
     rclpy.init(args=args)

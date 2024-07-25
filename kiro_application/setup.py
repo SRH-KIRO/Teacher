@@ -31,6 +31,7 @@ setup(
             'limo_control=kiro_application.limo_control:main',
             'take_a_picture=kiro_application.take_a_picture:main',
             'dl_detect_line=kiro_application.dl_detect_line:main',
+            'dl_control=kiro_application.dl_control:main',
         ],
     },
 )
