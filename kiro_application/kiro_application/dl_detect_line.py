@@ -98,11 +98,14 @@ class DLDetectLine(Node):
         cx_2 = int(300 * x_2)
 
         gap = Error()
-        gap.error_1 = 150 - cx_1
-        gap.error_2 = 150 - cx_2
+
+        ref = 150
+        gap.error_1 = ref - cx_1
+        gap.error_2 = ref - cx_2
 
         debug_image = cv2.circle(resize_img, (cx_1, 190), 10, (255, 0, 0), -1)
         debug_image = cv2.circle(debug_image, (cx_2, 190), 10,(0, 0, 255), -1)
+        debug_image = cv2.line(debug_image, (ref, 0), (ref, 300),(0,255,0), 5)
 
         self.debug_publisher.publish(self.br.cv2_to_imgmsg(debug_image, 'bgr8'))
         self.error_publisher.publish(gap)

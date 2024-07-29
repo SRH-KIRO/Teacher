@@ -15,4 +15,8 @@ def generate_launch_description():
             package='kiro_application',
             executable='dl_control',
             name='limo_control_node'),
+        launch_ros.actions.Node(
+            package='kiro_application',
+            executable='detect_object',
+            name='detect_object_node'),
   ])
