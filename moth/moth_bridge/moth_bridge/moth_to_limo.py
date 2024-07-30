@@ -19,7 +19,6 @@ class MothToLimo(Node):
         self.lift_pub_ = self.create_publisher(UInt8, 'lift_cmd', 10) # lift 조종하는 command
         # moth server에서 limo 시나리오 상테 및 limo control data를 제어하는 부분
         self.moth_cmd_pub_ = self.create_publisher(MothCmd, 'moth_cmd', 10) 
-        
 
         # set initial value for the limo command
         self.moth_cmd_  = MothCmd()

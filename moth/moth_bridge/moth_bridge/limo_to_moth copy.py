@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
+import json
 
 import rclpy
 from rclpy.node import Node
@@ -11,8 +12,6 @@ import websocket
 import gi
 gi.require_version("Gst", "1.0")
 from gi.repository import Gst
-
-import json
 
 class LimoToMoth(Node):
     def __init__(self):
@@ -50,7 +49,6 @@ class LimoToMoth(Node):
         self.orignal_img_sub_
         self.yolo_img_sub_
         self.emergency_situation_sub_
-    
 
         Gst.init(None)
         self.cmd_ori = "appsrc do-timestamp=true is-live=true format=time name=src caps=video/x-raw,format=BGR,width=640,height=480 ! videoconvert ! x264enc bitrate=2048 key-int-max=30 speed-preset=1 tune=zerolatency ! video/x-h264, alignment=au, stream-format=byte-stream ! h264parse config-interval=1 ! queue ! appsink name=sink sync=false drop=true max-buffers=2 emit-signals=true"
@@ -99,15 +97,17 @@ class LimoToMoth(Node):
 
 
     def emergencySituationCallback(self, msg):
+        # bool data true 일때 빨간색, Bool Data false일 때, 초록색
         data = {
-            "emergency" : msg.data
+            "emergency": msg.data
         }
         data = bytes(json.dumps(data), "UTF-8")
+        print(data)
         try:
             self.ws_emr.send(data, opcode=websocket.ABNF.OPCODE_BINARY)
-        except:
+        except (websocket.WebSocketConnectionClosedException, BrokenPipeError) as e:
+            print(f"Error occurred: {e}")
             self.ws_emr.connect(f"ws://cobot.center:8286/pang/ws/pub?channel={self.channel}&track=emergency&mode=single&key={self.key}")
-
 
     def originalImageSenderCallback(self, appsink):
         sample = self.sink_ori.emit("pull-sample")
