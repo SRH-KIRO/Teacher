@@ -77,9 +77,6 @@ class DlControl(Node):
                 if i.name == "pedestrian":
                     tmp_pedestrian = True
                 
-        
-
-
     def stop_callback(self, msg):
         self.stop_flag = msg.data
 

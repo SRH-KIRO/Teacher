@@ -53,7 +53,7 @@ class DlControl(Node):
         )
 
         self.timer_ = self.create_timer(0.1, self.timer_callback)
-        self.mission_num = MissionNum.OUTERLINE
+        self.mission_num = MissionNum.INNERLINE
         
         self.slow_down_flag = False
         self.turn_right_flag = False
@@ -67,7 +67,7 @@ class DlControl(Node):
         self.turn_right_duration.sec = 2
         self.turn_right_past_time = time.time()
 
-        self.pedestrian_size = 300.0
+        self.pedestrian_size = 200.0
         self.pedestrian_duration = Duration()
         self.pedestrian_duration.sec = 3
         self.pedestrian_duration_pass_by = Duration()
