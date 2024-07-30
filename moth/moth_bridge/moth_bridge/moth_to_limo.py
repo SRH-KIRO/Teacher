@@ -13,6 +13,9 @@ class MothToLimo(Node):
     def __init__(self):
         super().__init__('moth_to_limo')
 
+        self.channel = "cqjl0h639m9rvs3djuog"
+        self.key = "wego"
+
         self.lift_pub_ = self.create_publisher(UInt8, 'lift_cmd', 10) # lift 조종하는 command
         # moth server에서 limo 시나리오 상테 및 limo control data를 제어하는 부분
         self.moth_cmd_pub_ = self.create_publisher(MothCmd, 'moth_cmd', 10) 
@@ -31,7 +34,7 @@ class MothToLimo(Node):
         self.wall_timer = self.create_timer(0.1, self.publishData)
 
         self.ws = websocket.WebSocket()
-        self.ws.connect(f"ws://cobot.center:8286/pang/ws/sub?channel={channel}&track=control&mode=single&key={key}")
+        self.ws.connect(f"ws://cobot.center:8286/pang/ws/sub?channel={self.channel}&track=control&mode=single&key={self.key}")
 
         self.thr = threading.Thread(target=self.recv, args=[]).start()
 #        self.msg_recver = self.create_timer(0.1, self.recv)
@@ -44,7 +47,7 @@ class MothToLimo(Node):
                 print("data: ", data)
             except (websocket.WebSocketConnectionClosedException, BrokenPipeError) as e:
                 print(f"Error occurred: {e}")
-                self.ws.connect("ws://cobot.center:8286/pang/ws/sub?channel=instant&name=wego&track=control&mode=single")
+                self.ws.connect(f"ws://cobot.center:8286/pang/ws/sub?channel={self.channel}&track=control&mode=single&key={self.key}")
 #                self.ws.connect(f"ws://{host}:{port}/{path}")
 #                data = self.ws.recv()
             try:
