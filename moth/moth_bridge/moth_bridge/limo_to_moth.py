@@ -27,7 +27,7 @@ class LimoToMoth(Node):
         # 기본 이미지 받는 subscription
         self.orignal_img_sub_ = self.create_subscription(
                                         Image,
-                                        '/camera/color/image_raw',
+                                        'modify_image',
                                         self.originalImageCallback,
                                         rclpy.qos.qos_profile_sensor_data
                                     )

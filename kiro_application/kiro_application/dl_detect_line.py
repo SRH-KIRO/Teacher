@@ -28,7 +28,7 @@ class DLDetectLine(Node):
 
         self.subscription = self.create_subscription(
                             Image,
-                            '/camera/color/image_raw', 
+                            'modify_image', 
                             self.image_callback, 
                             10)
         self.subscription # to prevent from warning

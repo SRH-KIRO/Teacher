@@ -33,6 +33,7 @@ setup(
             'dl_detect_line=kiro_application.dl_detect_line:main',
             'dl_control=kiro_application.dl_control:main',
             'detect_object=kiro_application.detect_object:main',
+            'modify_image=kiro_application.modify_image:main',
         ],
     },
 )

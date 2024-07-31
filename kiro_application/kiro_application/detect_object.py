@@ -27,7 +27,7 @@ class DetectObject(Node):
         # Subscribe camera data
         self.subscription = self.create_subscription(
                             Image,
-                            '/camera/color/image_raw', 
+                            'modify_image', 
                             self.image_callback, 
                             rclpy.qos.qos_profile_sensor_data)
         self.subscription # to prevent from warning
