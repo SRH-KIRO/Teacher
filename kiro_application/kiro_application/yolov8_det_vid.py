@@ -80,7 +80,7 @@ class YoLov8TRT(object):
 
     def __init__(self, library, engine_file_path):
 
-        self.categories = ["pedestrian", "slow_down", "turn_right"]
+        self.categories = ["emergency", "fish", "octopus", "pedestrian", "slow_down", "turn_right"]
 
         TRT_LOGGER = trt.Logger(trt.Logger.INFO)
         runtime = trt.Runtime(TRT_LOGGER)

@@ -11,6 +11,7 @@ from kiro_msgs.msg import BoundingBoxes
 from moth_msgs.msg import MothCmd
 
 from builtin_interfaces.msg import Duration
+from std_msgs.msg import Bool
 import time
 
 import math
@@ -47,6 +48,12 @@ class DlControl(Node):
             'cmd_vel',
             10
         )
+
+        self.emergency_pub = self.create_publisher(
+            Bool,
+            'emergency_situation',
+            10
+        )
     
         self.box_sub_ = self.create_subscription(
             BoundingBoxes,
@@ -67,13 +74,18 @@ class DlControl(Node):
         self.slow_down_flag = False
         self.turn_right_flag = False
         self.pedestrian_flag = False
+        self.emergency_flag = False
 
         self.slow_down_duration = Duration()
         self.slow_down_duration.sec = 1
         self.slow_down_past_time = time.time()
 
+        self.emergency_duration = Duration()
+        self.emergency_duration.sec = 1
+        self.emergency_past_time = time.time()
+
         self.turn_right_duration = Duration()
-        self.turn_right_duration.sec = 2
+        self.turn_right_duration.sec = 3
         self.turn_right_past_time = time.time()
 
         self.pedestrian_size = 200.0
@@ -117,6 +129,7 @@ class DlControl(Node):
         tmp_slow_down = False
         tmp_turn_right = False
         tmp_pedestrian = False
+        tmp_emergency = False
 
         current_time = time.time()
 
@@ -131,6 +144,10 @@ class DlControl(Node):
                 if i.name == "pedestrian":
                     if math.sqrt((i.xmin - i.xmax)**2 + (i.ymin - i.ymax)**2) > self.pedestrian_size:
                         tmp_pedestrian = True
+                if i.name == "emergency":
+                    tmp_emergency = True
+                    self.emergency_past_time = current_time
+                
         
         if tmp_slow_down:
             self.slow_down_flag = True
@@ -139,6 +156,14 @@ class DlControl(Node):
                 self.slow_down_flag = False
             else:
                 self.slow_down_flag = True
+        
+        if tmp_emergency:
+            self.emergency_flag = True
+        else:
+            if int(current_time - self.emergency_past_time) > self.emergency_duration.sec:
+                self.emergency_flag = False
+            else:
+                self.emergency_flag = True
 
         if tmp_turn_right:
             self.turn_right_flag = True
@@ -169,11 +194,13 @@ class DlControl(Node):
 
     def error_callback(self, msg):
         self.control_1 =  msg.error_1 * 0.008
-        self.control_2 =  msg.error_2 * 0.015
+        self.control_2 =  msg.error_2 * 0.01
         self.start_flag = True
 
     def timer_callback(self):
         cmd = Twist()
+        emergency = Bool()
+        emergency.data = True
 
         if self.start_flag:
             if self.mission_num == MissionNum.OUTERLINE:
@@ -184,6 +211,10 @@ class DlControl(Node):
                 if self.pedestrian_flag:
                     cmd.linear.x = 0.0
                     cmd.angular.z =0.0
+                if self.emergency_flag:
+                    cmd.linear.x = 0.0
+                    cmd.angular.z =0.0
+                    emergency.data = False
             elif self.mission_num == MissionNum.INNERLINE:
                 cmd.linear.x = 0.35
                 cmd.angular.z = self.control_1
@@ -195,15 +226,20 @@ class DlControl(Node):
                 if self.turn_right_flag:
                     cmd.linear.x = 0.2
                     cmd.angular.z = self.control_2
+                if self.emergency_flag:
+                    cmd.linear.x = 0.0
+                    cmd.angular.z =0.0
+                    emergency.data = False
             else:
                 cmd = self.manual_cmd
 
         if self.stop_flag:
             cmd.linear.x = 0.0
             cmd.angular.z =0.0
-
+        
         cmd.angular.z = min(max(cmd.angular.z, -MAX_STEERING), MAX_STEERING)
 
+        self.emergency_pub.publish(emergency)
         self.cmd_pub_.publish(cmd)
 
 def main(args=None):
