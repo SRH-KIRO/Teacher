@@ -85,7 +85,7 @@ class DlControl(Node):
         self.emergency_past_time = time.time()
 
         self.turn_right_duration = Duration()
-        self.turn_right_duration.sec = 3
+        self.turn_right_duration.sec = 2
         self.turn_right_past_time = time.time()
 
         self.pedestrian_size = 200.0
@@ -193,8 +193,8 @@ class DlControl(Node):
         self.stop_flag = msg.data
 
     def error_callback(self, msg):
-        self.control_1 =  msg.error_1 * 0.008
-        self.control_2 =  msg.error_2 * 0.01
+        self.control_1 =  msg.error_1 * 0.005
+        self.control_2 =  msg.error_2 * 0.0035
         self.start_flag = True
 
     def timer_callback(self):
@@ -219,7 +219,7 @@ class DlControl(Node):
                 cmd.linear.x = 0.35
                 cmd.angular.z = self.control_1
                 if self.slow_down_flag:
-                    cmd.linear.x = 0.15
+                    cmd.linear.x = 0.2
                 if self.pedestrian_flag:
                     cmd.linear.x = 0.0
                     cmd.angular.z =0.0
